@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "freshai"
+version = "0.1.0"
+description = "AI Assistant for Crime Investigators using LLM and VLM capabilities"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    {name = "FreshAI Team", email = "team@freshai.com"},
+]
+keywords = ["ai", "crime investigation", "llm", "vlm", "ollama", "transformers"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Legal Industry",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "requests>=2.28.0",
+    "aiohttp>=3.8.0",
+    "pydantic>=2.0.0",
+    "transformers>=4.30.0",
+    "torch>=2.0.0",
+    "pillow>=9.0.0",
+    "numpy>=1.21.0",
+    "opencv-python>=4.7.0",
+    "python-dotenv>=1.0.0",
+    "typer[all]>=0.9.0",
+    "rich>=13.0.0",
+    "asyncio>=3.4.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.0.280",
+    "mypy>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Michael89/FreshAI"
+Repository = "https://github.com/Michael89/FreshAI"
+
+[project.scripts]
+freshai = "freshai.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["freshai*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
