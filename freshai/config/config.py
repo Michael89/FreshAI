@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
 from .models import ModelConfig, OllamaConfig, TransformersConfig
+from ..mcp.config import MCPConfig
 
 
 class Config(BaseModel):
@@ -19,6 +20,9 @@ class Config(BaseModel):
     # Model configurations
     ollama: OllamaConfig = Field(default_factory=OllamaConfig)
     transformers: TransformersConfig = Field(default_factory=TransformersConfig)
+    
+    # MCP configuration
+    mcp: MCPConfig = Field(default_factory=MCPConfig)
     
     # Tools and features
     enable_vision: bool = Field(default=True, description="Enable vision capabilities")
@@ -63,4 +67,5 @@ class Config(BaseModel):
             case_storage_path=case_path,
             ollama=OllamaConfig.load_from_env(),
             transformers=TransformersConfig.load_from_env(),
+            mcp=MCPConfig.load_from_env(),
         )
