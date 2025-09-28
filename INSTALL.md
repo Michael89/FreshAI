@@ -4,37 +4,25 @@ This guide will help you install and set up FreshAI for crime investigation assi
 
 ## System Requirements
 
-- Python 3.8 or higher
+- Python 3.9 or higher
+- **uv** (modern Python package manager)
 - 4GB+ RAM (more recommended for ML models)
 - Disk space: 2GB+ (more for model storage)
 
 ## Installation Options
 
-### Option 1: Quick Start (Basic Functionality)
+### Option 1: Quick Start with uv (Recommended)
 
-For basic functionality without heavy ML dependencies:
+First, install uv if you haven't already:
 
 ```bash
-# Clone the repository
-git clone https://github.com/Michael89/FreshAI.git
-cd FreshAI
-
-# Install minimal dependencies
-pip install pydantic python-dotenv typer[all] rich pytest
-
-# Run the demo
-python demo.py
+# Install uv
+pip install uv
+# or
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-This provides:
-- Configuration management
-- Investigation tools (text analysis, evidence analysis)
-- CLI framework
-- Basic validation and utilities
-
-### Option 2: Full Installation (Recommended)
-
-For complete functionality including LLM/VLM capabilities:
+Then install FreshAI:
 
 ```bash
 # Clone the repository
@@ -42,14 +30,37 @@ git clone https://github.com/Michael89/FreshAI.git
 cd FreshAI
 
 # Install all dependencies
-pip install -r requirements.txt
+uv sync
 
-# Or install in development mode
+# Run the demo
+uv run python demo.py
+```
+
+This provides:
+- Full functionality including ML capabilities
+- Automatic virtual environment management
+- Fast dependency resolution
+- Complete investigation toolset
+
+### Option 2: Traditional pip Installation
+
+If you prefer to use pip instead of uv:
+
+```bash
+# Clone the repository
+git clone https://github.com/Michael89/FreshAI.git
+cd FreshAI
+
+# Install in development mode
 pip install -e .
+
+# Or install directly from pyproject.toml
+pip install .
 ```
 
 This includes:
-- All basic functionality
+- All functionality from pyproject.toml
+- Manual virtual environment management required
 - Ollama integration for local LLM/VLM
 - Transformers library support
 - Advanced image analysis with OpenCV
@@ -64,16 +75,16 @@ For development and contributing:
 git clone https://github.com/Michael89/FreshAI.git
 cd FreshAI
 
-# Install in development mode with dev dependencies
-pip install -e ".[dev]"
+# Install with development dependencies using uv
+uv sync --all-extras
 
 # Run tests
-pytest
+uv run pytest
 
 # Run linting
-black freshai/
-ruff check freshai/
-mypy freshai/
+uv run black freshai/
+uv run ruff check freshai/
+uv run mypy freshai/
 ```
 
 ## External Dependencies
@@ -111,10 +122,10 @@ python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
 
 ```bash
 # Initialize in current directory
-python -m freshai init
+uv run freshai init
 
 # Or specify directory
-python -m freshai init /path/to/investigation/workspace
+uv run freshai init /path/to/investigation/workspace
 ```
 
 This creates:
@@ -155,29 +166,29 @@ TRANSFORMERS_DEVICE=auto
 
 ```bash
 # Run the demo script
-python demo.py
+uv run python demo.py
 
 # Run basic tests
-python tests/test_basic.py
+uv run python tests/test_basic.py
 
 # Or use pytest
-pytest tests/
+uv run pytest tests/
 ```
 
 ### Test Full Installation
 
 ```bash
 # Test CLI
-python -m freshai --help
+uv run freshai --help
 
 # Test with sample case
-python -m freshai init ./test_workspace
+uv run freshai init ./test_workspace
 cd test_workspace
-python -m freshai start-case TEST001 --description "Test case"
+uv run freshai start-case TEST001 --description "Test case"
 echo "Sample evidence text" > evidence/sample.txt
-python -m freshai analyze TEST001 evidence/sample.txt
-python -m freshai ask TEST001 "What evidence was found?"
-python -m freshai report TEST001
+uv run freshai analyze TEST001 evidence/sample.txt
+uv run freshai ask TEST001 "What evidence was found?"
+uv run freshai report TEST001
 ```
 
 ### Test Ollama Integration
@@ -197,9 +208,9 @@ python examples/basic_usage.py
 1. **Import Errors**
    ```bash
    # Missing dependencies
-   pip install -r requirements.txt
-   
-   # Path issues
+   uv sync
+
+   # Path issues (if not using uv run)
    export PYTHONPATH="${PYTHONPATH}:$(pwd)"
    ```
 
@@ -226,9 +237,9 @@ python examples/basic_usage.py
    ```bash
    # Ensure directories are writable
    chmod -R 755 evidence/ cases/
-   
-   # Or use user installation
-   pip install --user -r requirements.txt
+
+   # uv automatically handles user-level virtual environments
+   # No additional permission changes needed
    ```
 
 ### Performance Optimization
@@ -259,7 +270,7 @@ After successful installation:
 
 2. **Start Your First Investigation**
    ```bash
-   python -m freshai start-case CASE001 --description "My first case"
+   uv run freshai start-case CASE001 --description "My first case"
    ```
 
 3. **Explore Advanced Features**

@@ -21,10 +21,10 @@ FreshAI is a comprehensive AI platform designed to assist crime investigators wi
 git clone https://github.com/Michael89/FreshAI.git
 cd FreshAI
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies with uv (recommended)
+uv sync
 
-# Or install in development mode
+# Or install in development mode with pip
 pip install -e .
 ```
 
@@ -40,16 +40,16 @@ pip install -e .
    ollama pull llava
    ```
 
-2. **Python 3.8+** with the required dependencies
+2. **Python 3.9+** and **uv** (install with `pip install uv` or `curl -LsSf https://astral.sh/uv/install.sh | sh`)
 
 ### Initialize FreshAI
 
 ```bash
 # Initialize FreshAI in current directory
-freshai init
+uv run freshai init
 
 # Or initialize in specific directory
-freshai init /path/to/investigation/workspace
+uv run freshai init /path/to/investigation/workspace
 ```
 
 This creates the necessary directories and configuration files:
@@ -63,52 +63,52 @@ This creates the necessary directories and configuration files:
 ### 1. Start a New Case
 
 ```bash
-freshai start-case CASE001 --description "Investigation of digital evidence"
+uv run freshai start-case CASE001 --description "Investigation of digital evidence"
 ```
 
 ### 2. Analyze Evidence
 
 ```bash
 # Analyze an image
-freshai analyze CASE001 /path/to/evidence/photo.jpg --type image
+uv run freshai analyze CASE001 /path/to/evidence/photo.jpg --type image
 
 # Analyze text document
-freshai analyze CASE001 /path/to/evidence/chat_log.txt --type text
+uv run freshai analyze CASE001 /path/to/evidence/chat_log.txt --type text
 
 # Auto-detect evidence type
-freshai analyze CASE001 /path/to/evidence/document.pdf
+uv run freshai analyze CASE001 /path/to/evidence/document.pdf
 ```
 
 ### 3. Ask Questions About the Case
 
 ```bash
-freshai ask CASE001 "What suspicious elements were found in the analyzed images?"
+uv run freshai ask CASE001 "What suspicious elements were found in the analyzed images?"
 ```
 
 ### 4. Generate Investigation Report
 
 ```bash
 # Generate and display report
-freshai report CASE001
+uv run freshai report CASE001
 
 # Save report to file
-freshai report CASE001 --output /path/to/reports/case001_final.json
+uv run freshai report CASE001 --output /path/to/reports/case001_final.json
 ```
 
 ### 5. Check Case Status
 
 ```bash
 # View case details
-freshai status CASE001
+uv run freshai status CASE001
 
 # List all active cases
-freshai list-cases
+uv run freshai list-cases
 ```
 
 ### 6. Close Case
 
 ```bash
-freshai close-case CASE001
+uv run freshai close-case CASE001
 ```
 
 ## Python API Usage
@@ -356,17 +356,19 @@ FreshAI/
 # Clone and install in development mode
 git clone https://github.com/Michael89/FreshAI.git
 cd FreshAI
-pip install -e ".[dev]"
+
+# Install with development dependencies using uv
+uv sync --all-extras
 
 # Run tests
-pytest
+uv run pytest
 
 # Format code
-black freshai/
-ruff check freshai/
+uv run black freshai/
+uv run ruff check freshai/
 
 # Type checking
-mypy freshai/
+uv run mypy freshai/
 ```
 
 ### Adding New Tools
