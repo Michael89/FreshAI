@@ -204,6 +204,134 @@ FreshAI includes specialized tools for criminal investigations:
 - Entity extraction (names, locations, organizations)
 - Sentiment and linguistic analysis
 
+## MCP Server Support
+
+FreshAI supports the Model Context Protocol (MCP) for extending functionality through external servers. MCP allows you to connect various specialized tools and services to enhance investigation capabilities.
+
+### Built-in MCP Servers
+
+FreshAI includes several example MCP servers:
+
+#### Filesystem Server
+Provides secure file system operations:
+- List files and directories
+- Read file contents safely
+- Get detailed file information
+- Access metadata and permissions
+
+#### Web Search Server
+Offers web-related utilities:
+- Extract URLs from text
+- Validate URL formats
+- Mock web search functionality (extensible to real search APIs)
+
+#### Database Server
+Enables database operations:
+- Execute SQL queries on SQLite databases
+- List tables and describe schemas
+- Create sample investigation databases
+- Secure parameter binding
+
+### MCP Configuration
+
+Configure MCP servers through environment variables:
+
+```env
+# MCP Settings
+FRESHAI_ENABLE_MCP=true
+FRESHAI_MCP_DEFAULT_TIMEOUT=30
+FRESHAI_MCP_MAX_CONCURRENT_SERVERS=5
+
+# Enable/disable specific servers
+FRESHAI_MCP_FILESYSTEM_ENABLED=true
+FRESHAI_MCP_WEB_SEARCH_ENABLED=false
+```
+
+### Using MCP Tools
+
+MCP tools integrate seamlessly with FreshAI's tool registry:
+
+```python
+from freshai.core import FreshAICore
+import asyncio
+
+async def use_mcp_tools():
+    core = FreshAICore()
+    await core.initialize()
+    
+    # List all available tools (including MCP tools)
+    tools = core.get_available_tools()
+    print("Available tools:", tools)
+    
+    # Use filesystem MCP tool
+    if "filesystem_list_files" in tools:
+        result = await core.use_tool("filesystem_list_files", {
+            "path": "/path/to/evidence"
+        })
+        print("Files found:", result)
+    
+    await core.cleanup()
+
+asyncio.run(use_mcp_tools())
+```
+
+### Creating Custom MCP Servers
+
+Create your own MCP servers for specialized tools:
+
+```python
+#!/usr/bin/env python3
+"""Custom MCP server example."""
+
+import json
+import sys
+
+class CustomMCPServer:
+    def __init__(self):
+        self.tools = {
+            "my_tool": {
+                "name": "my_tool",
+                "description": "My custom investigation tool",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "input": {"type": "string", "description": "Input parameter"}
+                    },
+                    "required": ["input"]
+                }
+            }
+        }
+    
+    def handle_tools_list(self, request):
+        return {
+            "jsonrpc": "2.0",
+            "id": request.get("id"),
+            "result": {"tools": list(self.tools.values())}
+        }
+    
+    def handle_tools_call(self, request):
+        # Implement your tool logic here
+        params = request.get("params", {})
+        # ... tool implementation ...
+        return {"jsonrpc": "2.0", "id": request.get("id"), "result": {...}}
+    
+    def run(self):
+        for line in sys.stdin:
+            request = json.loads(line.strip())
+            method = request.get("method")
+            
+            if method == "tools/list":
+                response = self.handle_tools_list(request)
+            elif method == "tools/call":
+                response = self.handle_tools_call(request)
+            
+            print(json.dumps(response))
+            sys.stdout.flush()
+
+if __name__ == "__main__":
+    CustomMCPServer().run()
+```
+
 ## Architecture
 
 ```

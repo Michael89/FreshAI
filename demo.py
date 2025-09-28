@@ -214,7 +214,56 @@ Action items:
     except Exception as e:
         print(f"❌ Validation test failed: {e}")
     
-    # Test 6: CLI Functionality (basic test)
+    # Test 6: MCP Server Integration
+    print_section("MCP Server Integration")
+    try:
+        from freshai.mcp import MCPClient, MCPConfig
+        from freshai.mcp.config import MCPServerConfig
+        import asyncio
+        
+        print("✓ MCP modules imported successfully")
+        
+        # Test MCP configuration
+        mcp_config = MCPConfig.load_from_env()
+        print(f"  - MCP enabled: {mcp_config.enable_mcp}")
+        print(f"  - Default timeout: {mcp_config.default_timeout}s")
+        print(f"  - Available servers: {list(mcp_config.servers.keys())}")
+        
+        # Test MCP client
+        client = MCPClient()
+        print(f"  - MCP client created")
+        print(f"  - Initial tools: {len(client.get_available_tools())}")
+        
+        async def test_mcp_integration():
+            """Test MCP server integration."""
+            try:
+                # Test with the filesystem server
+                if "filesystem" in mcp_config.servers:
+                    fs_config = mcp_config.servers["filesystem"]
+                    print(f"  - Testing filesystem server: {fs_config.name}")
+                    
+                    # Note: In a real scenario, we'd start the server
+                    # For demo purposes, we just show the configuration
+                    print(f"    Command: {fs_config.command} {' '.join(fs_config.arguments)}")
+                    print(f"    Enabled: {fs_config.enabled}")
+                
+                print("  - MCP integration test completed (servers not started in demo)")
+                
+            except Exception as e:
+                print(f"  - MCP integration error: {e}")
+        
+        await test_mcp_integration()
+        
+        # Show available MCP server files
+        mcp_servers_dir = Path(__file__).parent / "mcp_servers"
+        if mcp_servers_dir.exists():
+            server_files = [f.name for f in mcp_servers_dir.glob("*.py") if f.name != "__init__.py"]
+            print(f"  - Available MCP servers: {server_files}")
+        
+    except Exception as e:
+        print(f"❌ MCP integration test failed: {e}")
+    
+    # Test 7: CLI Functionality (basic test)
     print_section("CLI Interface")
     try:
         # Test just the CLI structure without importing agent
@@ -245,6 +294,8 @@ Action items:
     print("  - Evidence file analysis and hashing")
     print("  - Validation utilities")
     print("  - CLI framework structure")
+    print("  - MCP (Model Context Protocol) server support")
+    print("  - Example MCP servers (filesystem, web search, database)")
     
     print("\nTo enable full functionality, install:")
     print("  pip install aiohttp transformers torch opencv-python pillow numpy")

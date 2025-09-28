@@ -9,6 +9,7 @@ from ..config import Config
 from ..llm import OllamaLLM, TransformersLLM
 from ..vlm import OllamaVLM, TransformersVLM
 from ..tools import ToolRegistry
+from ..mcp import MCPClient
 from .base import BaseModel, ModelResponse
 
 
@@ -27,6 +28,9 @@ class FreshAICore:
         
         # Tool registry
         self.tool_registry = ToolRegistry()
+        
+        # MCP client
+        self.mcp_client = MCPClient()
         
         self._initialized = False
         
@@ -52,6 +56,9 @@ class FreshAICore:
             
             # Initialize tools
             await self._initialize_tools()
+            
+            # Initialize MCP servers
+            await self._initialize_mcp_servers()
             
             self._initialized = True
             logger.info("FreshAI Core initialized successfully")
@@ -129,6 +136,37 @@ class FreshAICore:
             self.tool_registry.register("image_analyzer", ImageAnalyzer())
             
         self.tool_registry.register("text_analyzer", TextAnalyzer())
+    
+    async def _initialize_mcp_servers(self) -> None:
+        """Initialize MCP servers and register their tools."""
+        if not self.config.mcp.enable_mcp:
+            logger.info("MCP support is disabled")
+            return
+        
+        logger.info("Initializing MCP servers...")
+        
+        for server_name, server_config in self.config.mcp.servers.items():
+            if not server_config.enabled:
+                logger.info(f"MCP server {server_name} is disabled")
+                continue
+            
+            try:
+                success = await self.mcp_client.add_server(server_config)
+                if success:
+                    logger.info(f"Successfully initialized MCP server: {server_name}")
+                    
+                    # Register MCP tools with the tool registry
+                    mcp_tools = self.mcp_client.get_all_tools()
+                    for tool_name, mcp_tool in mcp_tools.items():
+                        if tool_name.startswith(f"{server_name}_"):
+                            self.tool_registry.register(tool_name, mcp_tool)
+                            logger.info(f"Registered MCP tool: {tool_name}")
+                else:
+                    logger.warning(f"Failed to initialize MCP server: {server_name}")
+                    
+            except Exception as e:
+                logger.error(f"Error initializing MCP server {server_name}: {e}")
+    
     
     async def generate_response(
         self, 
@@ -208,6 +246,9 @@ class FreshAICore:
     async def cleanup(self) -> None:
         """Clean up all resources."""
         logger.info("Cleaning up FreshAI Core...")
+        
+        # Stop MCP servers
+        await self.mcp_client.stop_all_servers()
         
         # Cleanup models
         for model in self.llm_models.values():
