@@ -11,7 +11,6 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from .agent import InvestigatorAgent
 from .config import Config
 from .utils import setup_logging, validate_case_id
 
@@ -24,7 +23,7 @@ app = typer.Typer(
 console = Console()
 
 
-def create_agent(config_path: Optional[str] = None) -> InvestigatorAgent:
+def create_agent(config_path: Optional[str] = None):
     """Create and return an investigator agent."""
     if config_path:
         config = Config.load_from_env(config_path)
@@ -32,7 +31,16 @@ def create_agent(config_path: Optional[str] = None) -> InvestigatorAgent:
         config = Config.load_from_env()
     
     setup_logging(config.log_level)
-    return InvestigatorAgent(config)
+    
+    # Try to import the agent, handle missing dependencies gracefully
+    try:
+        from .agent import InvestigatorAgent
+        return InvestigatorAgent(config)
+    except ImportError as e:
+        console.print(f"[red]Error: Missing dependencies for full functionality: {e}[/red]")
+        console.print("Please install required dependencies:")
+        console.print("pip install aiohttp transformers torch opencv-python pillow numpy")
+        raise typer.Exit(1)
 
 
 @app.command()
