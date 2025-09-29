@@ -1,0 +1,12 @@
+Case ID: CASE_001
+Description: Robbery investigation from juvelery store
+Suspect: John Doe
+Date Opened: 2025-09-29
+Lead Investigator: Detective Smith
+
+Initial findings:
+- Suspect device seized during search warrant execution
+- Multiple photos found on device showing possible evidence of financial fraud
+- Additional photos added by investigator during evidence collection
+- There where robery some expencive juvelery were stolen in Rome but suspect is living in Poland
+- There is hotel near the place where robbery happened is in the investigator reference photos
